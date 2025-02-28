@@ -53,7 +53,7 @@ curl http://localhost:8080/orders/1
 After payment simulation:
 
 ```bash
-curl http://localhost:8080/orders/1
+curl http://localhost:8080/orders/1/status
 ```
 Expected Response:
 
@@ -123,7 +123,7 @@ curl -X POST http://localhost:8080/orders -d '{"customer_id":1,"products":[{"id"
 curl -X POST http://localhost:8081/payments -d '{"order_id":1,"amount":"1","phone":"254708374149"}'
 
 # 5. Verify system state
-curl http://localhost:8080/orders/1
+curl http://localhost:8080/orders/1/status
 ```
 
 ## 3. Tests
