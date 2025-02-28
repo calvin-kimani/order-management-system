@@ -1,0 +1,44 @@
+# Node.js and NPM
+node_modules/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# SvelteKit build and output
+/.svelte-kit
+/.vite
+/build/
+
+# Docker
+docker-compose.override.yml
+docker-compose.env
+.docker/
+
+# PostgreSQL data
+pgdata/
+
+# Environment variables (don't push .env files to public repos)
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE or editor-specific files
+.vscode/
+.idea/
+
+# Dependency directories
+/.pnp
+.pnp.js
+
+# Miscellaneous
+*.tgz
+*.bak
+*.swp
+*.swo

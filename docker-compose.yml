@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    env_file: .env
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - order-management
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+
+  orderservice:
+    build: ./orderservice
+    env_file: .env
+    ports: ["8080:8080"]
+    networks: ["order-management"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    environment:
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_USER: ${POSTGRES_USER}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      DB_NAME: ${POSTGRES_DB}
+    command: ["./wait-for.sh", "postgres:5432", "--", "./orderservice"]
+
+  paymentservice:
+    build: ./paymentservice
+    env_file:
+      - .env
+    ports: ["8081:8081"]
+    networks: ["order-management"]
+    depends_on:
+      orderservice:
+        condition: service_started
+    restart: unless-stopped
+    environment:
+      ORDERS_SERVICE_URL: ${ORDERS_SERVICE_URL}
+      MPESA_CONSUMER_KEY: ${MPESA_CONSUMER_KEY}
+      MPESA_CONSUMER_SECRET: ${MPESA_CONSUMER_SECRET}
+      MPESA_BUSINESS_SHORTCODE: ${MPESA_BUSINESS_SHORTCODE}
+      MPESA_PASSKEY: ${MPESA_PASSKEY}
+      MPESA_CALLBACK_URL: ${MPESA_CALLBACK_URL}
+
+volumes:
+  pgdata:
+    driver: local
+
+networks:
+  order-management:
+    driver: bridge
